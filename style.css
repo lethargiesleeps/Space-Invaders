@@ -4,4 +4,6 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    background: url('./img/background.png');
+    background-size: cover;
 }
