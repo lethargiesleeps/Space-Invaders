@@ -26,6 +26,12 @@ class Player {
         const projectile = this.game.getProjectile();
         if(projectile) projectile.start(this.xPos + this.width * 0.5, this.yPos);
     }
+
+    restart() {
+        this.xPos = this.game.width * 0.5 - this.width * 0.5;
+        this.yPos = this.game.height - this.height;
+        this.lives = 3;
+    }
 }
 
 class Projectile {
@@ -160,6 +166,7 @@ class Game {
         this.player = new Player(this);
         this.keys = [];
         this.projectiles = [];
+        this.fired = false;
         this.numberOfProjectiles = 10;
         this.createProjectiles();
 
@@ -176,13 +183,14 @@ class Game {
 
         //Event Listeners
         window.addEventListener('keydown', event => {
-            if(this.keys.indexOf(event.key) !== -1) return;
-            this.keys.push(event.key);
-            console.log(`Key: ${event.key}\nCode: ${event.code}`);
-            if(event.code === 'Space') this.player.shoot();
+            if(event.code === 'Space' && !this.fired) this.player.shoot();
+            this.fired = true;
+            if((event.key === 'r' || event.key === 'R') && this.gameOver) this.restart();
+            if(this.keys.indexOf(event.key) === -1) this.keys.push(event.key.toLowerCase())
         });
 
         window.addEventListener('keyup', event => {
+            this.fired = false;
             const index = this.keys.indexOf(event.key);
             if(index > -1) this.keys.splice(index, 1);
         });
@@ -208,6 +216,17 @@ class Game {
                 //this.player.lives++;
             }
         });
+    }
+
+    restart() {
+        this.player.restart();
+        this.columns = 2;
+        this.rows = 2;
+        this.enemyWaveCount = 1;
+        this.enemyWaves = [];
+        this.enemyWaves.push(new EnemyWave(this));
+        this.gameOver = false;
+        this.score = 0;
     }
 
     newWave() {
